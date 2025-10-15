@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Find a Therapist & Book</title>
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+  />
+
+  <style>
+    :root {
+      --color-bg-main: #2c3e50;
+      --color-bg-card: #34495e;
+      --color-accent-teal: #55a8a7;
+      --color-accent-pink: #e83e6f;
+      --color-text-light: #ecf0f1;
+      --color-text-muted: #95a5a6;
+    }
+
+    body {
+      background-color: var(--color-bg-main);
+      color: var(--color-text-light);
+      min-height: 100vh;
+      font-family: sans-serif;
+      padding: 20px;
+    }
+
+    .header-section {
+      padding: 15px 0;
+      margin-bottom: 25px;
+      border-bottom: 1px solid #3e5267;
+    }
+
+    .form-control-dark,
+    .form-select-dark {
+      background-color: #3e5267;
+      border: 1px solid #4a647d;
+      color: var(--color-text-light);
+    }
+    .form-control-dark::placeholder {
+      color: var(--color-text-muted);
+    }
+
+    .filter-panel {
+      background-color: var(--color-bg-card);
+      border-radius: 10px;
+      padding: 20px;
+    }
+    .filter-group-title {
+      color: var(--color-accent-teal);
+      font-weight: 600;
+      margin-top: 15px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #4a647d;
+      padding-bottom: 5px;
+    }
+
+    .therapist-card {
+      background-color: var(--color-bg-card);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 15px;
+      border-left: 5px solid var(--color-accent-teal);
+      transition: box-shadow 0.2s;
+    }
+    .therapist-card:hover {
+      box-shadow: 0 0 10px rgba(85, 168, 167, 0.4);
+    }
+
+    .profile-pic {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background-color: #4a647d;
+      border: 2px solid var(--color-accent-teal);
+    }
+
+    .rating-star {
+      color: gold;
+    }
+
+    .btn-book {
+      background-color: var(--color-accent-teal);
+      color: white;
+      font-weight: 600;
+    }
+
+    /* Booking modal extra styles */
+    .type-option {
+      background-color: #3e5267;
+      border: 2px solid transparent;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      padding: 15px;
+    }
+    .type-option:hover,
+    .type-option.selected {
+      border-color: var(--color-accent-teal);
+      box-shadow: 0 0 10px rgba(85, 168, 167, 0.5);
+    }
+    .timeslot-btn {
+      background-color: #4a647d;
+      color: var(--color-text-light);
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      margin-right: 8px;
+      white-space: nowrap;
+    }
+    .timeslot-btn.selected {
+      background-color: var(--color-accent-teal);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="container-fluid">
+    <header class="header-section d-flex justify-content-between align-items-center">
+      <a
+        href="/user/userPage"
+        class="btn btn-sm text-decoration-none"
+        style="color: var(--color-accent-teal);"
+      >
+        <i class="fas fa-arrow-left me-2"></i> Dashboard
+      </a>
+      <h1 class="fs-4 fw-bold mb-0">Find Professional Help</h1>
+      <div></div>
+    </header>
+
+    <div class="row">
+      <div class="col-lg-3 mb-4">
+        <div class="filter-panel sticky-top">
+          <h5 class="fw-bold mb-3">Refine Your Search</h5>
+
+          <div class="mb-3">
+            <input
+              type="text"
+              class="form-control form-control-dark"
+              id="nameSearch"
+              placeholder="Search by Name..."
+            />
+          </div>
+
+          <h6 class="filter-group-title">Specialisation</h6>
+          <div class="mb-3">
+            <select class="form-select form-select-dark" id="specialisationFilter">
+              <option value="All" selected>All Areas</option>
+              <option value="Anxiety & Stress">Anxiety & Stress</option>
+              <option value="Depression">Depression</option>
+              <option value="Relationship Issues">Relationship Issues</option>
+              <option value="Trauma">Trauma</option>
+            </select>
+          </div>
+
+          <h6 class="filter-group-title">Session Type</h6>
+          <div class="mb-3">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                value="Video"
+                id="filterVideo"
+                checked
+              />
+              <label class="form-check-label" for="filterVideo">Video Call</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="Chat" id="filterChat" />
+              <label class="form-check-label" for="filterChat">Chat Only</label>
+            </div>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                value="In-Person"
+                id="filterInPerson"
+              />
+              <label class="form-check-label" for="filterInPerson">In-Person (Local)</label>
+            </div>
+          </div>
+
+          <h6 class="filter-group-title">Minimum Rating</h6>
+          <div class="mb-3">
+            <select class="form-select form-select-dark" id="ratingFilter">
+              <option value="0" selected>Any Rating</option>
+              <option value="4.5">4.5 Stars & Up</option>
+              <option value="4.0">4.0 Stars & Up</option>
+              <option value="3.5">3.5 Stars & Up</option>
+            </select>
+          </div>
+
+          <button class="btn btn-sm btn-teal w-100" id="applyFilterButton">
+            Apply Filters
+          </button>
+        </div>
+      </div>
+
+      <div class="col-lg-9">
+        <h4 class="mb-4" id="resultCount">Showing All Available Therapists</h4>
+        <div id="therapistListContainer"></div>
+        <p
+          class="text-center text-muted mt-5"
+          id="noResultsMessage"
+          style="display: none;"
+        >
+          No therapists matched your current filter criteria.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Booking Modal -->
+  <div
+    class="modal fade"
+    id="bookingModal"
+    tabindex="-1"
+    aria-labelledby="bookingModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content" style="background-color: var(--color-bg-card);">
+        <div class="modal-header border-bottom border-secondary">
+          <h5
+            class="modal-title text-light"
+            id="bookingModalLabel"
+          >
+            Book Session with <span id="therapistNameDisplay" class="fw-bold text-success"></span>
+          </h5>
+          <button
+            type="button"
+            class="btn-close btn-close-white"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body text-light">
+          <!-- Step 1 -->
+          <div id="step1">
+            <h6>1. Select Session Type</h6>
+            <div class="row g-3 text-center">
+              <div class="col-md-4">
+                <div class="type-option" data-type="Video">
+                  <i class="fas fa-video fa-2x text-info mb-2"></i>
+                  <div class="fw-bold">Video Call</div>
+                  <small class="text-muted">₹2,500 / 45 min</small>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="type-option" data-type="Chat">
+                  <i class="fas fa-comments fa-2x text-warning mb-2"></i>
+                  <div class="fw-bold">Chat Only</div>
+                  <small class="text-muted">₹1,800 / 45 min</small>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="type-option" data-type="In-Person">
+                  <i class="fas fa-user-friends fa-2x text-danger mb-2"></i>
+                  <div class="fw-bold">In-Person</div>
+                  <small class="text-muted">₹3,000 / 45 min</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div id="step2" style="display: none;">
+            <h6>2. Choose Date & Time</h6>
+            <div class="mb-3">
+              <label class="form-label text-light">Select Date</label>
+              <input
+                type="date"
+                class="form-control form-control-dark"
+                id="bookingDate"
+              />
+            </div>
+            <h6 class="mt-3">Available Time Slots</h6>
+            <div
+              id="timeSlotsContainer"
+              class="d-flex overflow-auto gap-3 pb-3"
+            ></div>
+          </div>
+
+          <!-- Step 3 -->
+          <div id="step3" style="display: none;">
+            <h6>3. Confirm Booking</h6>
+            <div class="border p-3 rounded border-secondary">
+              <ul class="list-unstyled small">
+                <li><strong>Therapist:</strong> <span id="confirmTherapist"></span></li>
+                <li><strong>Type:</strong> <span id="confirmType"></span></li>
+                <li>
+                  <strong>Date & Time:</strong>
+                  <span id="confirmDateTime"></span>
+                </li>
+                <li><strong>Fee:</strong> ₹<span id="confirmFee"></span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-secondary btn-sm" id="backButton" style="display: none;">
+            Back
+          </button>
+          <button type="button" class="btn btn-primary btn-sm" id="nextButton">
+            Next
+          </button>
+          <button type="button" class="btn btn-success btn-sm" id="confirmButton" style="display: none;">
+            Confirm & Pay
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Dummy data
+    const DUMMY_THERAPISTS = [
+      { id: 1, name: 'Dr. Sanya Kapoor', specialisation: 'Anxiety & Stress', rating: 4.7, method: 'Video', nextSlot: 'Today, 5:00 PM', bio: 'Expert in CBT and mindfulness.' },
+      { id: 2, name: 'Mr. Rohan Patel', specialisation: 'Depression', rating: 4.1, method: 'Chat', nextSlot: 'Tomorrow, 11:00 AM', bio: 'Focus on relationship dynamics.' },
+      { id: 3, name: 'Dr. Neha Sharma', specialisation: 'Relationship Issues', rating: 4.5, method: 'Video', nextSlot: 'Today, 4:00 PM', bio: 'Certified grief counselor.' }
+      // add more as you had
+    ];
+
+    const therapistListContainer = document.getElementById('therapistListContainer');
+    const resultCount = document.getElementById('resultCount');
+    const noResultsMessage = document.getElementById('noResultsMessage');
+    const applyFilterButton = document.getElementById('applyFilterButton');
+    const specialisationFilter = document.getElementById('specialisationFilter');
+    const ratingFilter = document.getElementById('ratingFilter');
+    const nameSearch = document.getElementById('nameSearch');
+
+    function renderStars(rating) {
+      let stars = '';
+      const full = Math.floor(rating);
+      const half = rating % 1 >= 0.5;
+      for (let i = 0; i < full; i++) stars += '<span class="rating-star"><i class="fas fa-star"></i></span>';
+      if (half) stars += '<span class="rating-star"><i class="fas fa-star-half-alt"></i></span>';
+      const empties = 5 - full - (half ? 1 : 0);
+      for (let i = 0; i < empties; i++) stars += '<span class="rating-star" style="color:#4a647d;"><i class="far fa-star"></i></span>';
+      return stars;
+    }
+
+    function renderTherapistList(list) {
+      therapistListContainer.innerHTML = '';
+      if (list.length === 0) {
+        noResultsMessage.style.display = 'block';
+        resultCount.textContent = 'Showing 0 Results';
+        return;
+      }
+      noResultsMessage.style.display = 'none';
+      resultCount.textContent = `Showing ${list.length} Available Therapists`;
+      list.forEach(t => {
+        const card = document.createElement('div');
+        card.className = 'therapist-card d-flex align-items-center';
+        card.innerHTML = `
+          <div class="profile-pic me-4"></div>
+          <div class="flex-grow-1">
+            <h5>${t.name}</h5>
+            <p class="small text-muted mb-1">Specialisation: ${t.specialisation} | Method: ${t.method}</p>
+            ${renderStars(t.rating)} <span class="small text-muted">(${t.rating}/5)</span>
+            <p class="small text-muted mt-1">${t.bio}</p>
+          </div>
+          <div>
+            <button class="btn btn-sm btn-book" onclick="bookSession(${t.id})">Book Session</button>
+            <p class="mt-2 small text-muted text-end mb-0">Next Slot: ${t.nextSlot}</p>
+          </div>
+        `;
+        therapistListContainer.appendChild(card);
+      });
+    }
+
+    function applyFilters() {
+      const term = nameSearch.value.toLowerCase();
+      const spec = specialisationFilter.value;
+      const minRating = parseFloat(ratingFilter.value);
+      const selectedMethods = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(c => c.value);
+
+      const filtered = DUMMY_THERAPISTS.filter(t => {
+        const nm = t.name.toLowerCase().includes(term);
+        const sp = (spec === 'All' || t.specialisation === spec);
+        const md = selectedMethods.includes(t.method);
+        const rt = t.rating >= minRating;
+        return nm && sp && md && rt;
+      });
+      renderTherapistList(filtered);
+    }
+
+    applyFilterButton.addEventListener('click', applyFilters);
+    nameSearch.addEventListener('keypress', e => {
+      if (e.key === 'Enter') applyFilters();
+    });
+
+    renderTherapistList(DUMMY_THERAPISTS);
+
+    // Booking Modal Logic
+    const bookingModal = new bootstrap.Modal(document.getElementById('bookingModal'));
+    let bookingData = { type: '', date: '', time: '' };
+    let currentStep = 1;
+
+    const step1 = document.getElementById('step1');
+    const step2 = document.getElementById('step2');
+    const step3 = document.getElementById('step3');
+    const therapistNameDisplay = document.getElementById('therapistNameDisplay');
+    const bookingDate = document.getElementById('bookingDate');
+    const timeSlotsContainer = document.getElementById('timeSlotsContainer');
+    const backButton = document.getElementById('backButton');
+    const nextButton = document.getElementById('nextButton');
+    const confirmButton = document.getElementById('confirmButton');
+
+    function showStep(step) {
+      step1.style.display = step === 1 ? 'block' : 'none';
+      step2.style.display = step === 2 ? 'block' : 'none';
+      step3.style.display = step === 3 ? 'block' : 'none';
+      backButton.style.display = step > 1 ? 'inline-block' : 'none';
+      nextButton.style.display = step < 3 ? 'inline-block' : 'none';
+      confirmButton.style.display = step === 3 ? 'inline-block' : 'none';
+      currentStep = step;
+
+      if (step === 2) {
+        const today = new Date().toISOString().split('T')[0];
+        bookingDate.value = today;
+        bookingDate.min = today;
+        generateTimeSlots(today);
+      }
+      if (step === 3) {
+        document.getElementById('confirmTherapist').textContent = therapistNameDisplay.textContent;
+        document.getElementById('confirmType').textContent = bookingData.type;
+        document.getElementById('confirmDateTime').textContent = `${bookingData.date} at ${bookingData.time}`;
+        document.getElementById('confirmFee').textContent = bookingData.fee;
+      }
+    }
+
+    function generateTimeSlots(date) {
+      timeSlotsContainer.innerHTML = '';
+      const slots = ['09:00', '10:30', '12:00', '14:00', '15:30', '17:00'];
+      slots.forEach(s => {
+        const btn = document.createElement('button');
+        btn.className = 'timeslot-btn';
+        // convert to 12h for display
+        const [h, m] = s.split(':');
+        let hh = parseInt(h);
+        const ampm = hh >= 12 ? 'PM' : 'AM';
+        hh = hh % 12 || 12;
+        const disp = hh + ':' + m + ' ' + ampm;
+        btn.textContent = disp;
+        btn.dataset.time = disp;
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.timeslot-btn').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          bookingData.date = bookingDate.value;
+          bookingData.time = disp;
+        });
+        timeSlotsContainer.appendChild(btn);
+      });
+    }
+
+    bookingDate.addEventListener('change', () => {
+      generateTimeSlots(bookingDate.value);
+      bookingData.time = '';
+    });
+
+    backButton.addEventListener('click', () => {
+      if (currentStep > 1) showStep(currentStep - 1);
+    });
+    nextButton.addEventListener('click', () => {
+      if (currentStep === 1 && !bookingData.type) {
+        alert('Please select session type');
+        return;
+      }
+      if (currentStep === 2 && !bookingData.time) {
+        alert('Please select time slot');
+        return;
+      }
+      showStep(currentStep + 1);
+    });
+    confirmButton.addEventListener('click', () => {
+    // Show mock payment modal
+    document.getElementById('payTherapist').textContent = therapistNameDisplay.textContent;
+    document.getElementById('payAmount').textContent = bookingData.fee;
+    const paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
+    paymentModal.show();
+
+    // Close booking modal
+    bookingModal.hide();
+
+    // Handle mock payment success
+    document.getElementById('mockPayBtn').onclick = () => {
+        paymentModal.hide();
+        setTimeout(() => {
+        alert(`✅ Payment successful!\nYour booking with ${therapistNameDisplay.textContent} on ${bookingData.date} at ${bookingData.time} is confirmed.`);
+        }, 400);
+    };
+    });
+
+
+    function bookSession(id) {
+      const t = DUMMY_THERAPISTS.find(x => x.id === id);
+      therapistNameDisplay.textContent = t.name;
+      bookingData = { type: '', date: '', time: '', fee: '' };
+      document.querySelectorAll('.type-option').forEach(o => o.classList.remove('selected'));
+      showStep(1);
+      bookingModal.show();
+    }
+
+    document.querySelectorAll('.type-option').forEach(opt => {
+      opt.addEventListener('click', () => {
+        document.querySelectorAll('.type-option').forEach(o => o.classList.remove('selected'));
+        opt.classList.add('selected');
+        const tp = opt.getAttribute('data-type');
+        bookingData.type = tp;
+        bookingData.fee = tp === 'Video' ? '2500' : tp === 'Chat' ? '1800' : '3000';
+      });
+    });
+  </script>
+  <!-- Simple mock payment modal -->
+<div class="modal fade" id="paymentModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="background-color: var(--color-bg-card); color: var(--color-text-light);">
+      <div class="modal-header border-bottom border-secondary">
+        <h5 class="modal-title">Payment Gateway</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-3">You are paying ₹<span id="payAmount"></span> for your session with <span id="payTherapist"></span>.</p>
+        <div class="d-grid gap-2">
+          <button class="btn btn-success" id="mockPayBtn"><i class="fas fa-check-circle me-2"></i>Proceed to Pay</button>
+          <button class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

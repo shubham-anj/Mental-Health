@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Mood Questionnaire</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        /* --- THEME COLORS FOR CONSISTENCY --- */
+        :root {
+            --color-bg-main: #2c3e50;
+            --color-bg-card: #34495e; 
+            --color-accent-teal: #55a8a7;
+            --color-accent-pink: #e83e6f;
+            --color-text-light: #ecf0f1;
+            --color-text-muted: #95a5a6;
+        }
+
+        /* General Theme Styling - Dark Mode */
+        body {
+            background-color: var(--color-bg-main);
+            color: var(--color-text-light);
+            min-height: 100vh;
+            font-family: sans-serif;
+            padding: 20px;
+        }
+
+        /* Card Styling */
+        .mood-card {
+            background-color: var(--color-bg-card);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            max-width: 600px; /* Limit width for better desktop experience */
+            margin: auto;
+        }
+
+        /* --- QUESTIONNAIRE STYLING --- */
+        .question-card {
+             background-color: #3e5267;
+             padding: 25px;
+             border-radius: 10px;
+             min-height: 150px;
+             display: flex;
+             flex-direction: column;
+             justify-content: space-between;
+        }
+        
+        .answer-option {
+            background-color: #4a647d;
+            color: var(--color-text-light);
+            border: 1px solid transparent;
+            margin-bottom: 8px;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        .answer-option:hover {
+            background-color: #5d7a96;
+        }
+
+        .answer-option.selected {
+            background-color: var(--color-accent-teal);
+            border-color: var(--color-accent-teal);
+            font-weight: 600;
+        }
+
+        /* --- FINAL MOOD CHOICE (Emojis) --- */
+        .mood-scale {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px 0;
+            margin-top: 20px;
+        }
+
+        .mood-option {
+            font-size: 2.5rem;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: transform 0.2s, opacity 0.2s;
+            line-height: 1;
+        }
+
+        .mood-option.final-selected {
+            opacity: 1;
+            transform: scale(1.25);
+            color: var(--color-accent-teal);
+            text-shadow: 0 0 10px rgba(85, 168, 167, 0.5);
+        }
+
+        /* --- Result/Buttons --- */
+        .btn-save-mood {
+            background-color: var(--color-accent-teal);
+            color: white;
+            font-weight: 700;
+            padding: 12px;
+            border-radius: 10px;
+            transition: background-color 0.3s;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container my-5">
+        <header class="text-center mb-5">
+            <a href="/user/userPage" class="btn btn-sm btn-outline-secondary float-start">
+                <i class="fas fa-arrow-left me-2"></i> Dashboard
+            </a>
+            <h1 class="fw-bold fs-3">Daily Behavioral Check</h1>
+            <small class="text-muted" id="currentDateDisplay">Loading date...</small>
+        </header>
+
+        <div class="mood-card">
+            
+            <div id="questionsContainer" class="mb-4">
+                <div class="text-center p-5">
+                    <i class="fas fa-spinner fa-spin fa-2x"></i>
+                    <p class="mt-3">Loading questions...</p>
+                </div>
+            </div>
+
+            <div id="predictionSection" style="display:none;">
+                <hr class="border-secondary opacity-25 my-4">
+                <div id="predictionResult" class="text-center mb-4" style="font-size: 1.2rem; font-weight: 600;">
+                    </div>
+
+                <h4 class="mb-4 fw-normal text-center">Final Check: Overall, how was your mood today?</h4>
+                <div class="mood-scale" id="finalMoodScale">
+                    <span class="mood-option" data-mood="1" title="Very Bad">😢</span>
+                    <span class="mood-option" data-mood="2" title="Bad">😟</span>
+                    <span class="mood-option" data-mood="3" title="Neutral">😐</span>
+                    <span class="mood-option" data-mood="4" title="Good">🙂</span>
+                    <span class="mood-option" data-mood="5" title="Very Happy">😊</span>
+                </div>
+
+                <hr class="border-secondary opacity-25 my-4">
+                
+                <h5 class="mb-3 fw-normal">Context Tags & Notes (Optional)</h5>
+                <div id="contextTags" class="mb-4">
+                    <span class="tag-btn" data-tag="Work">Work</span>
+                    <span class="tag-btn" data-tag="Sleep">Sleep</span>
+                    <span class="tag-btn" data-tag="Exercise">Exercise</span>
+                    <span class="tag-btn" data-tag="Stressed">Stressed</span>
+                    <span class="tag-btn" data-tag="Calm">Calm</span>
+                    <span class="tag-btn" data-tag="Social">Social</span>
+                </div>
+                <textarea class="form-control mb-4" placeholder="Quick notes about your day..."></textarea>
+                
+                <button class="btn btn-save-mood w-100" id="saveButton">Save Daily Entry</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const STORAGE_KEY_MOODS = 'mentalHealthDailyMoods';
+
+        // --- 1. MOOD SCORING DATA ---
+        const QUESTIONS_DATA = [
+            { text: '1. Aaj aapka focus kaisa tha?', answers: [{ text: 'Bahut achha', score: 2 }, { text: 'Theek thaak', score: 1 }, { text: 'Poori tarah bikhar gaya', score: -2 }] },
+            { text: '2. Aaj aapne apne liye kya kiya? (Self-care ya self-time)', answers: [{ text: 'Kaafi kuch kiya', score: 2 }, { text: 'Thoda time nikala', score: 1 }, { text: 'Kuch bhi nahi', score: -2 }] },
+            { text: '3. Aapne aaj ka din kaise bitaya?', answers: [{ text: 'Productive', score: 2 }, { text: 'Relaxing', score: 1 }, { text: 'Mixed', score: 0 }, { text: 'Boring', score: -1 }, { text: 'Overwhelming', score: -2 }] },
+            { text: '4. Aaj aapne screen time kitna use kiya?', answers: [{ text: 'Kam (0–2 hrs)', score: 2 }, { text: 'Moderate (2–5 hrs)', score: 0 }, { text: 'Zyada (5+ hrs)', score: -2 }] },
+            { text: '5. Kya aapko aaj kisi cheez ne surprise ya delight kiya?', answers: [{ text: 'Yes', score: 2 }, { text: 'No', score: 0 }] },
+            { text: '6. Aaj ka weather aapko kaisa laga?', answers: [{ text: 'Accha laga', score: 1 }, { text: 'Normal', score: 0 }, { text: 'Bura laga', score: -1 }] },
+            { text: '7. Aaj aapne physical movement kiya?', answers: [{ text: 'Exercise', score: 2 }, { text: 'Walk', score: 1 }, { text: 'Housework', score: 1 }, { text: 'Nahi', score: -1 }] },
+            { text: '8. Aapka aaj ka din kis tarah se guzra?', answers: [{ text: 'Calm', score: 2 }, { text: 'Balanced', score: 1 }, { text: 'Rush mein', score: -1 }, { text: 'Emotional', score: -1 }] },
+            { text: '9. Aapne aaj kuch creative kiya ya seekha?', answers: [{ text: 'Haan', score: 2 }, { text: 'Nahi', score: 0 }] },
+            { text: '10. Aapko aaj kisi cheez ki kami mehsoos hui?', answers: [{ text: 'Yes', score: -1 }, { text: 'No', score: 1 }] }
+        ];
+
+        // --- 2. MOOD MAPPING ---
+        const MOOD_MAPPING = [
+            { range: [12, 20], emoji: '😊', mood: 'Khush', color: '#55a8a7' },     
+            { range: [7, 11], emoji: '🙂', mood: 'Theek-thaak', color: '#8ddb93' },  
+            { range: [2, 6], emoji: '😐', mood: 'Neutral', color: '#f0e68c' },      
+            { range: [-3, 1], emoji: '😟', mood: 'Thoda udaas', color: '#ffb347' },  
+            { range: [-10, -4], emoji: '😢', mood: 'Bahut udaas', color: '#e83e6f' }
+        ];
+
+        // --- 3. STATE VARIABLES ---
+        let currentQIndex = 0;
+        let totalScore = 0;
+        let finalSelectedMood = null;
+
+        const questionsContainer = document.getElementById('questionsContainer');
+        const predictionSection = document.getElementById('predictionSection');
+        const predictionResult = document.getElementById('predictionResult');
+        const finalMoodOptions = document.querySelectorAll('#finalMoodScale .mood-option');
+        const tagButtons = document.querySelectorAll('#contextTags .tag-btn');
+        const saveButton = document.getElementById('saveButton');
+        const notesArea = document.querySelector('textarea');
+        const currentDateDisplay = document.getElementById('currentDateDisplay');
+
+        // --- 4. CORE FUNCTIONS ---
+
+        function getPredictedMood(score) {
+            for (const mapping of MOOD_MAPPING) {
+                if (score >= mapping.range[0] && score <= mapping.range[1]) {
+                    return mapping;
+                }
+            }
+            return { emoji: '❓', mood: 'Unknown', color: '#95a5a6' };
+        }
+
+        function displayPrediction(score) {
+            const predicted = getPredictedMood(score);
+            predictionResult.innerHTML = `
+                🧠 **Predicted Mood:** <span style="color: ${predicted.color};">${predicted.emoji} ${predicted.mood}</span> 
+                <br><span style="font-size: 0.9em; color: ${predicted.color};">(Total Score: ${score})</span>
+            `;
+            // Scroll to the result section
+            predictionSection.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Function to render the current question
+        function renderQuestion(index) {
+            if (index >= QUESTIONS_DATA.length) {
+                // End of quiz - show results
+                questionsContainer.innerHTML = '<div class="text-center p-5"><h4 style="color:var(--color-accent-teal);">Check-in Complete!</h4><p>Your mood analysis is ready.</p></div>';
+                predictionSection.style.display = 'block';
+                displayPrediction(totalScore);
+                return;
+            }
+
+            const qData = QUESTIONS_DATA[index];
+            let html = `
+                <div class="question-card">
+                    <div>
+                        <p class="text-muted small mb-1">Question ${index + 1} of ${QUESTIONS_DATA.length}</p>
+                        <h5 class="mb-3">${qData.text}</h5>
+                    </div>
+                    <div class="d-grid gap-2" id="answerOptions">
+            `;
+            
+            qData.answers.forEach((answer, aIndex) => {
+                html += `
+                    <div class="answer-option" data-score="${answer.score}" data-q-index="${index}">
+                        ${answer.text} <span class="float-end small text-muted">(${answer.score > 0 ? '+' : ''}${answer.score})</span>
+                    </div>
+                `;
+            });
+
+            html += `
+                    </div>
+                </div>
+            `;
+            questionsContainer.innerHTML = html;
+
+            // Attach event listeners to the new answer options
+            document.querySelectorAll('#answerOptions .answer-option').forEach(option => {
+                option.addEventListener('click', handleAnswerClick);
+            });
+        }
+        
+        // Handler for answering a question
+        function handleAnswerClick(event) {
+            const selectedOption = event.currentTarget;
+            const score = parseInt(selectedOption.dataset.score);
+            
+            // Mark as selected (visual feedback)
+            selectedOption.parentNode.querySelectorAll('.answer-option').forEach(opt => opt.classList.remove('selected'));
+            selectedOption.classList.add('selected');
+            
+            // Calculate score and move to next question
+            totalScore += score;
+            currentQIndex++;
+            
+            // Delay for better UX before moving to the next question
+            setTimeout(() => {
+                renderQuestion(currentQIndex);
+            }, 300);
+        }
+        
+        // Final save logic (combined with the previous save function)
+        function saveDailyEntry() {
+            if (currentQIndex < QUESTIONS_DATA.length) {
+                 alert("Please complete the check-in first.");
+                 return;
+            }
+            if (!finalSelectedMood) {
+                alert("Please select your Final Overall Mood using the emojis.");
+                return;
+            }
+
+            const today = new Date().toISOString().split('T')[0];
+            const selectedTags = Array.from(tagButtons)
+                                    .filter(btn => btn.classList.contains('active'))
+                                    .map(btn => btn.dataset.tag);
+                                    
+            const entry = {
+                date: today,
+                user_mood_emoji: finalSelectedMood.emoji,
+                user_mood_value: finalSelectedMood.value,
+                predicted_score: totalScore,
+                tags: selectedTags,
+                notes: notesArea.value.trim()
+            };
+
+            let savedMoods = JSON.parse(localStorage.getItem(STORAGE_KEY_MOODS) || '[]');
+            const existingIndex = savedMoods.findIndex(e => e.date === today);
+            
+            if (existingIndex > -1) {
+                savedMoods[existingIndex] = entry;
+            } else {
+                savedMoods.push(entry);
+            }
+
+            localStorage.setItem(STORAGE_KEY_MOODS, JSON.stringify(savedMoods));
+            alert(`Daily entry saved! Mood: ${finalSelectedMood.emoji}`);
+            location.reload(); // Reload to start a new session
+        }
+
+        // --- 5. INITIALIZATION ---
+        
+        function initialize() {
+            currentDateDisplay.textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+            
+            // Final Mood Emoji Listener
+            finalMoodOptions.forEach(option => {
+                option.addEventListener('click', (e) => {
+                    finalMoodOptions.forEach(o => o.classList.remove('final-selected'));
+                    e.currentTarget.classList.add('final-selected');
+                    finalSelectedMood = {
+                        emoji: e.currentTarget.textContent.trim(),
+                        value: e.currentTarget.dataset.mood
+                    };
+                });
+            });
+
+            // Context Tagging Listener
+            tagButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    button.classList.toggle('active');
+                });
+            });
+            
+            saveButton.addEventListener('click', saveDailyEntry);
+            
+            // Start the first question
+            renderQuestion(currentQIndex);
+        }
+
+        initialize();
+    </script>
+</body>
+</html>

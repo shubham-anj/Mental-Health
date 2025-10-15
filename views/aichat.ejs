@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aura AI Assistant</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    :root {
+      --bg-main: #2c3e50;
+      --bg-chat: #34495e;
+      --bot: #4a647d;
+      --teal: #55a8a7;
+      --text-light: #ecf0f1;
+      --text-muted: #95a5a6;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      font-family: "Segoe UI", sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .chat-container {
+      background-color: var(--bg-chat);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 550px;
+      height: 90vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
+    }
+
+    .chat-header {
+      background-color: #3e5267;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #51667f;
+      color: var(--text-light);
+    }
+
+    #messages {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      scroll-behavior: smooth;
+    }
+
+    .message-bubble {
+      padding: 12px 18px;
+      border-radius: 15px;
+      line-height: 1.5;
+      max-width: 80%;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(5px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .bot-message {
+      background-color: var(--bot);
+      color: var(--text-light);
+      align-self: flex-start;
+      border-bottom-left-radius: 2px;
+    }
+
+    .user-message {
+      background-color: var(--teal);
+      color: #fff;
+      align-self: flex-end;
+      border-bottom-right-radius: 2px;
+    }
+
+    .chat-input-area {
+      background-color: #3e5267;
+      border-top: 1px solid #51667f;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .input-text {
+      background-color: #4a647d;
+      border: none;
+      color: var(--text-light);
+      flex-grow: 1;
+      border-radius: 20px;
+      padding: 10px 15px;
+    }
+
+    .btn-send {
+      background-color: var(--teal);
+      border: none;
+      color: white;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+    }
+
+    .btn-admin {
+      background-color: transparent;
+      color: var(--teal);
+      border: none;
+      font-size: 1.3rem;
+    }
+
+    .typing-indicator {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-left: 15px;
+      display: none;
+    }
+
+    .modal-content {
+      background-color: #3e5267;
+      color: var(--text-light);
+      border-radius: 10px;
+    }
+
+    .form-control {
+      background-color: #4a647d;
+      color: var(--text-light);
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">
+      <button class="btn-admin" id="adminToggle"><i class="fa-solid fa-plus"></i></button>
+      <h6 class="mb-0 fw-bold"><i class="fa-solid fa-robot me-2"></i> Aura AI Assistant</h6>
+      <span class="small text-success">Online</span>
+    </div>
+
+    <div id="messages"></div>
+
+    <div class="typing-indicator" id="typingIndicator">Aura is typing...</div>
+
+    <div class="chat-input-area">
+      <form id="chatForm" class="d-flex w-100">
+        <input type="text" id="userInput" class="form-control input-text" placeholder="Type your message..." autocomplete="off" required />
+        <button type="submit" class="btn-send"><i class="fa-solid fa-paper-plane"></i></button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Admin Modal -->
+  <div class="modal fade" id="adminModal" tabindex="-1" aria-labelledby="adminModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header border-secondary">
+          <h5 class="modal-title" id="adminModalLabel">Add New Bot Script</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <form id="scriptForm">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="keywordInput" class="form-label small">Trigger Keyword:</label>
+              <input type="text" id="keywordInput" class="form-control" required />
+            </div>
+            <div class="mb-3">
+              <label for="responseInput" class="form-label small">Bot Response:</label>
+              <textarea id="responseInput" rows="5" class="form-control" required></textarea>
+            </div>
+          </div>
+          <div class="modal-footer border-secondary">
+            <button type="submit" class="btn btn-success">Save Script</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const RESPONSE_STORAGE_KEY = "auraBotScripts";
+    const messagesContainer = document.getElementById("messages");
+    const chatForm = document.getElementById("chatForm");
+    const userInput = document.getElementById("userInput");
+    const typingIndicator = document.getElementById("typingIndicator");
+    const adminToggle = document.getElementById("adminToggle");
+    const scriptForm = document.getElementById("scriptForm");
+    const adminModal = new bootstrap.Modal(document.getElementById("adminModal"));
+
+    let responses = {};
+
+    const DEFAULT_SCRIPTS = {
+      HI: "Hi there 🌿 I'm really glad you reached out. How are you feeling right now?",
+      HELLO: "Hello, it’s nice to see you here. You don’t have to be okay all the time. What’s been on your mind lately?",
+      SAD: "I can feel that things have been hard. Sometimes sadness is our heart’s way of asking for gentleness. Would you like to talk about what’s been heavy lately?",
+      DEPRESSED: "It sounds like you’ve been struggling for a while. You don’t have to go through this alone. I can share a few small steps to ease your mind — would you like that?",
+      ALONE: "Feeling alone can be painful. I want you to remember something: you still matter, and your story isn’t over yet 💙",
+      HOPELESS: "When hope feels distant, that’s when you need the most care — not from perfection, but from patience. Would you like me to guide you through something soothing?",
+      ANXIOUS: "Anxiety can make everything feel unsafe. Let’s take a deep breath together 🌬️",
+      TIRED: "Emotional exhaustion is real. It’s okay to rest. Would you like a short self-care exercise?",
+      HELP: "You’re not weak for asking for help — you’re brave for recognizing you need it. I can share coping exercises if you say *yes*.",
+      YES: "Here are some self-care steps:\n1️⃣ Take 3 deep breaths\n2️⃣ Write one thing you're grateful for\n3️⃣ Drink water\n4️⃣ Look outside for something calm 🌤️",
+      RELAX: "Find a comfortable position 🌙\nClose your eyes. Inhale… hold… exhale slowly. Let go, just for a moment.",
+      GROUND: "Grounding exercise 🪷\n👉 5 things you can see\n👉 4 you can touch\n👉 3 you can hear\n👉 2 you can smell\n👉 1 you can taste.",
+      THANKS: "You're doing great. Small steps count, even just showing up here 🌷",
+      BYE: "Take care, okay? Healing isn’t linear, and you’re not alone 💫",
+      DEFAULT: "I'm here for you. You can tell me anything — no pressure 💭"
+    };
+
+    function loadScripts() {
+      const stored = JSON.parse(localStorage.getItem(RESPONSE_STORAGE_KEY) || "{}");
+      responses = { ...DEFAULT_SCRIPTS, ...stored };
+    }
+
+    function saveScript(keyword, response) {
+      const stored = JSON.parse(localStorage.getItem(RESPONSE_STORAGE_KEY) || "{}");
+      stored[keyword.toUpperCase()] = response;
+      localStorage.setItem(RESPONSE_STORAGE_KEY, JSON.stringify(stored));
+      loadScripts();
+    }
+
+    function renderMessage(text, sender) {
+      const div = document.createElement("div");
+      div.classList.add("message-bubble", sender === "bot" ? "bot-message" : "user-message");
+      div.innerHTML = text.replace(/\n/g, "<br>");
+      messagesContainer.appendChild(div);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function getResponse(userText) {
+      const upper = userText.toUpperCase().trim();
+      for (const key in responses) {
+        if (upper.includes(key)) return responses[key];
+      }
+      return responses.DEFAULT;
+    }
+
+    function botReply(userText) {
+      const reply = getResponse(userText);
+      typingIndicator.style.display = "block";
+      setTimeout(() => {
+        typingIndicator.style.display = "none";
+        renderMessage(reply, "bot");
+      }, 800);
+    }
+
+    chatForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const text = userInput.value.trim();
+      if (!text) return;
+      renderMessage(text, "user");
+      userInput.value = "";
+      botReply(text);
+    });
+
+    adminToggle.addEventListener("click", () => adminModal.show());
+
+    scriptForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const keyword = document.getElementById("keywordInput").value.trim();
+      const response = document.getElementById("responseInput").value.trim();
+      if (keyword && response) {
+        saveScript(keyword, response);
+        alert(`Script saved for keyword: ${keyword}`);
+        scriptForm.reset();
+        adminModal.hide();
+      }
+    });
+
+    window.onload = () => {
+      loadScripts();
+      renderMessage(responses.HI, "bot");
+    };
+  </script>
+</body>
+</html>

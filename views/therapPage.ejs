@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Therapist Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        /* --- THEME COLORS FOR CONSISTENCY --- */
+        :root {
+            --color-bg-main: #2c3e50;         /* Main Body Background */
+            --color-bg-card: #1c2838;         /* Feature Blocks Background */
+            --color-accent-teal: #55a8a7;
+            --color-accent-pink: #e83e6f;
+            --color-text-light: #ecf0f1;
+            --color-text-muted: #95a5a6;
+        }
+
+        /* General Theme Styling - Dark Mode */
+        body {
+            background-color: var(--color-bg-main); 
+            color: var(--color-text-light);
+            min-height: 100vh;
+            font-family: sans-serif;
+            padding: 20px;
+        }
+        
+        /* --- Top Navigation (Links) --- */
+        .top-nav-links {
+            color: var(--color-text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+        .top-nav-links a {
+            color: var(--color-text-muted);
+            text-decoration: none;
+            margin-left: 15px;
+        }
+        .top-nav-links a:hover {
+            color: var(--color-accent-teal);
+        }
+
+        /* --- Feature Card Styling (NOW CLICKABLE) --- */
+        .feature-card-link {
+            text-decoration: none;
+            color: var(--color-text-light);
+            display: block; /* Makes the entire container clickable */
+        }
+        
+        .feature-box {
+            background-color: var(--color-bg-card); 
+            border-radius: 10px;
+            height: 250px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+        .feature-box:hover {
+            box-shadow: 0 0 15px rgba(85, 168, 167, 0.3); /* Teal glow on hover */
+            transform: translateY(-2px);
+        }
+        
+        /* Placeholder Icon/Shape */
+        .box-placeholder {
+            background-color: #34495e; 
+            width: 100px;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--color-text-muted);
+            font-size: 2rem;
+            border-radius: 5px;
+        }
+        .box-placeholder.circle { border-radius: 50%; }
+        .box-placeholder.triangle { clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
+
+        /* Feature Description Text */
+        .feature-description {
+            padding: 0 15px;
+        }
+        
+        .feature-description h5 {
+            font-weight: 700;
+            color: var(--color-text-light);
+        }
+
+        .feature-description p {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+        }
+
+        /* Ensure columns take correct space within the d-flex structure */
+        .feature-row > div {
+            width: 50%; 
+        }
+        
+        /* --- Bottom Navigation (Fixed and Styled) --- */
+        .bottom-nav-bar {
+            background-color: var(--color-bg-main);
+            border-top: 1px solid #3e5267;
+            padding: 15px 0;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .bottom-nav-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--color-text-muted);
+            font-size: 0.8rem;
+            transition: color 0.2s;
+        }
+
+        .bottom-nav-link i {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .bottom-nav-link:hover {
+            color: var(--color-accent-teal);
+        }
+        
+        .main-content-padding {
+            padding-bottom: 80px;
+        }
+        
+        /* --- Responsive fix for stacking on small screens --- */
+        @media (max-width: 768px) {
+            .feature-row {
+                flex-direction: column;
+            }
+            .feature-row > div {
+                width: 100%;
+                padding: 0 15px;
+            }
+            .feature-row:nth-child(even) { 
+                flex-direction: column-reverse;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container main-content-padding">
+        
+        <div class="d-flex justify-content-end top-nav-links">
+            <a href="client_list.html">Clients</a>
+            <a href="therapist_calendar.html">Calendar</a>
+            <a href="#">Billing</a> </div>
+        
+        <h1 class="text-white fw-bold mb-5 mt-4">Therapist Portal</h1>
+
+        <div class="row">
+            
+            <div class="col-12 d-flex mb-4 feature-row">
+                <a href="/user/active" class="feature-card-link w-100 d-flex">
+                    <div class="w-50 feature-description">
+                        <h5 class="mb-2">My Active Clients</h5>
+                        <p>A searchable list of current clients with status updates, allowing you to quickly find and review client details.</p>
+                    </div>
+                    <div class="w-50 feature-box">
+                        <div class="box-placeholder square"><i class="fas fa-users"></i></div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-12 d-flex mb-4 feature-row">
+                <a href="/user/schedule" class="feature-card-link w-100 d-flex">
+                    <div class="w-50 feature-box">
+                        <div class="box-placeholder circle"><i class="fas fa-calendar-alt"></i></div>
+                    </div>
+                    <div class="w-50 feature-description">
+                        <h5 class="mb-2">Scheduling</h5>
+                        <p>View and manage your weekly appointment calendar, with slots for booking and session management.</p>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-12 d-flex mb-4 feature-row">
+                <a href="/user/billing" class="feature-card-link w-100 d-flex"> <div class="w-50 feature-description">
+                        <h5 class="mb-2">Practice Overview</h5>
+                        <p>Track metrics including Total Earnings, Sessions Completed, and Topic Trend Chart for data-driven insights.</p>
+                    </div>
+                    <div class="w-50 feature-box">
+                        <div class="box-placeholder triangle"><i class="fas fa-chart-line"></i></div>
+                    </div>
+                </a>
+            </div>
+            
+        </div>
+    </div>
+
+    <nav class="bottom-nav-bar">
+        <div class="d-flex justify-content-around container">
+            <a href="/user/note" class="bottom-nav-link">
+                <i class="fas fa-file-invoice"></i> Add Note
+            </a>
+            <a href="#" class="bottom-nav-link">
+                <i class="fas fa-chart-bar"></i> Reports
+            </a>
+            <a href="#" class="bottom-nav-link">
+                <i class="fas fa-receipt"></i> Billing
+            </a>
+        </div>
+    </nav>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Private Journal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        /* --- THEME COLORS FOR CONSISTENCY --- */
+        :root {
+            --color-bg-main: #2c3e50;         /* Main Body Background */
+            --color-bg-card: #34495e;         /* Journal Editor Card, History Cards */
+            --color-bg-darker: #1a1a1a;       /* Darker background for image blocks */
+            --color-accent-teal: #55a8a7;
+            --color-accent-pink: #e83e6f;
+            --color-text-light: #ecf0f1;
+            --color-text-muted: #95a5a6;
+        }
+
+        /* General Theme Styling - Dark Mode */
+        body {
+            background-color: var(--color-bg-main); 
+            color: var(--color-text-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: sans-serif;
+            padding: 20px; /* Overall padding for the screen edges */
+        }
+        
+        /* Utility for Pink Lines (from Dashboard) */
+        .pink-line {
+            width: 80px;
+            height: 4px;
+            margin: 10px auto 30px; /* Adjusted margin for better spacing */
+            background-color: var(--color-accent-pink);
+            border-radius: 2px;
+        }
+
+        /* --- Header / Top Bar --- */
+        .header-bar {
+            background-color: var(--color-bg-main); /* Match body for seamless look */
+            padding: 15px 0;
+            border-bottom: 1px solid #3e5267; /* Subtle separator */
+            margin-bottom: 20px;
+            border-radius: 10px; /* Soften corners */
+        }
+
+        .btn-teal {
+            background-color: var(--color-accent-teal);
+            color: white;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        .btn-teal:hover {
+            background-color: #438786;
+            color: white;
+        }
+
+        .btn-outline-secondary-custom { /* Custom class for the Dashboard button */
+            color: var(--color-text-muted);
+            border-color: var(--color-text-muted);
+            background-color: transparent;
+        }
+
+        .btn-outline-secondary-custom:hover {
+            background-color: var(--color-text-muted);
+            color: var(--color-bg-main);
+        }
+
+        /* --- Main Journal Editor Card --- */
+        .journal-editor-card {
+            background-color: var(--color-bg-card); /* Lighter dark grey */
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            margin-bottom: 20px; /* Space between editor and history */
+            display: flex;
+            flex-direction: column; /* Stack header, content, and placeholder */
+        }
+        
+        .editor-header {
+            padding: 15px 25px;
+            border-bottom: 1px solid #4a647d;
+        }
+
+        .editor-header input {
+            background: none;
+            border: none;
+            color: var(--color-text-light);
+            font-size: 1.5rem;
+            font-weight: 600;
+            width: 100%; /* Ensure input takes full width */
+        }
+        
+        .editor-header input:focus {
+            outline: none;
+        }
+
+        .journal-textarea {
+            flex-grow: 1; /* Take up remaining space */
+            background-color: var(--color-bg-card);
+            border: none;
+            color: var(--color-text-light);
+            padding: 25px;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            resize: none; /* Disable manual resizing */
+            min-height: 250px; /* Minimum height for editor */
+        }
+
+        .journal-textarea:focus {
+            outline: none;
+            box-shadow: none;
+        }
+
+        /* Placeholder for Image/Mood Blocks */
+        .image-placeholder-block {
+            background-color: var(--color-bg-darker); /* Darker block color */
+            border-radius: 5px;
+            height: 150px; /* Fixed height for visual consistency */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 2rem;
+            color: rgba(255, 255, 255, 0.2); /* Faint icon */
+        }
+
+        /* Style for the small shape placeholders */
+        .shape-placeholder {
+            background-color: var(--color-bg-darker);
+            width: 80px;
+            height: 80px;
+            border-radius: 5px; /* Default square */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.2);
+        }
+        .shape-placeholder.circle { border-radius: 50%; }
+        .shape-placeholder.triangle { clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
+
+        /* --- Past Entries / History Section --- */
+        .history-section-title {
+            padding: 0 15px; /* Match editor padding */
+            margin-bottom: 15px;
+        }
+        
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Responsive grid */
+            gap: 20px;
+            padding: 0 15px; /* Horizontal padding */
+            margin-bottom: 40px; /* Space before bottom bar */
+        }
+
+        .history-entry-card {
+            background-color: var(--color-bg-card); /* Lighter dark grey */
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .history-entry-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .history-entry-card h5 {
+            color: var(--color-text-light);
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .history-entry-card small {
+            color: var(--color-text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* --- Bottom Navigation Bar --- */
+        .bottom-nav-bar {
+            background-color: var(--color-bg-main); /* Match body for seamless look */
+            border-top: 1px solid #3e5267;
+            padding: 15px 0;
+            position: sticky; /* Make it sticky at the bottom */
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .bottom-nav-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--color-text-muted);
+            font-size: 0.8rem;
+            transition: color 0.2s;
+        }
+
+        .bottom-nav-link i {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .bottom-nav-link:hover {
+            color: var(--color-accent-teal);
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header-bar d-flex justify-content-between align-items-center container-fluid px-4">
+        <a href="/user/userPage" class="btn btn-outline-secondary-custom btn-sm">
+            <i class="fas fa-arrow-left me-2"></i> Dashboard
+        </a>
+
+        <div class="d-flex gap-3">
+            <button class="btn btn-teal" id="saveButton">
+                <i class="fas fa-save me-2"></i> Save Entry
+            </button>
+            <button class="btn btn-danger" id="deleteButton">
+                <i class="fas fa-trash me-2"></i> Delete Entry
+            </button>
+            <button class="btn btn-success" id="newEntryButton">
+                <i class="fas fa-plus me-2"></i> New Entry
+            </button>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="journal-editor-card">
+            <div class="editor-header">
+                <div class="d-flex align-items-center justify-content-between">
+                    <input type="text" class="form-control" id="entryTitle" placeholder="Today's Thought / Title">
+                    <small class="text-muted" id="entryDate">Loading date...</small>
+                </div>
+            </div>
+
+            <div class="p-3">
+                <div class="row g-2 mb-3">
+                    <div class="col-4">
+                        <div class="shape-placeholder square"><i class="fas fa-square"></i></div>
+                    </div>
+                    <div class="col-4">
+                        <div class="shape-placeholder circle"><i class="fas fa-circle"></i></div>
+                    </div>
+                    <div class="col-4">
+                        <div class="shape-placeholder triangle"><i class="fas fa-triangle"></i></div>
+                    </div>
+                </div>
+                <div class="image-placeholder-block mb-3">
+                    <i class="fas fa-camera"></i> <span class="ms-2">Add Photo/Visual</span>
+                </div>
+            </div>
+
+            <textarea class="journal-textarea" id="entryContent" placeholder="Start writing your thoughts here. It's a safe and private space."></textarea>
+        </div>
+
+        <div class="pink-line"></div>
+
+        <h4 class="text-white fw-bold history-section-title">Past Entries</h4>
+        <div id="entriesList" class="history-grid">
+            <p class="text-muted text-center col-12" id="noEntriesMessage">No saved entries yet.</p>
+        </div>
+        
+        <div class="pink-line"></div>
+        
+        <div class="image-placeholder-block mb-4">
+            <i class="fas fa-chart-line"></i> <span class="ms-2">Further Content / Trends</span>
+        </div>
+    </main>
+
+    <nav class="bottom-nav-bar container-fluid">
+        <div class="d-flex justify-content-around">
+            <a href="#" class="bottom-nav-link">
+                <i class="fas fa-home"></i> Home
+            </a>
+            <a href="#" class="bottom-nav-link">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            <a href="#" class="bottom-nav-link">
+                <i class="fas fa-heart"></i> Mood
+            </a>
+            <a href="#" class="bottom-nav-link">
+                <i class="fas fa-chart-bar"></i> Analyze
+            </a>
+        </div>
+    </nav>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        const STORAGE_KEY = 'mentalHealthJournalEntries';
+        const entryTitle = document.getElementById('entryTitle');
+        const entryContent = document.getElementById('entryContent');
+        const entryDate = document.getElementById('entryDate');
+        const entriesList = document.getElementById('entriesList');
+        const saveButton = document.getElementById('saveButton');
+        const newEntryButton = document.getElementById('newEntryButton');
+        const deleteButton = document.getElementById('deleteButton');
+        const noEntriesMessage = document.getElementById('noEntriesMessage');
+
+        let currentEntryId = null;
+
+        // --- Helper Functions ---
+
+        // Get all entries from Local Storage
+        function getEntries() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            return data ? JSON.parse(data) : [];
+        }
+
+        // Save entries to Local Storage
+        function saveEntries(entries) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+        }
+
+        // Format date beautifully
+        function formatDate(timestamp) {
+            const date = new Date(timestamp);
+            const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true };
+            return date.toLocaleString('en-US', options);
+        }
+
+        // --- Core Logic ---
+
+        // Renders the list of past entries in the history panel
+        function renderEntriesList() {
+            // Sort by newest first (highest timestamp)
+            const entries = getEntries().sort((a, b) => b.timestamp - a.timestamp); 
+            entriesList.innerHTML = '';
+            
+            // Delete button ka visibility control
+            deleteButton.style.display = currentEntryId ? 'inline-block' : 'none';
+
+            if (entries.length === 0) {
+                noEntriesMessage.style.display = 'block';
+                entriesList.appendChild(noEntriesMessage);
+                return;
+            } else {
+                noEntriesMessage.style.display = 'none';
+            }
+
+            entries.forEach(entry => {
+                const item = document.createElement('div');
+                item.className = `history-entry-card`; // Use new card style
+                item.setAttribute('data-id', entry.id);
+                
+                const title = entry.title && entry.title.trim() !== '' ? entry.title : "Untitled Entry";
+
+                item.innerHTML = `
+                    <h5 class="mb-0 text-truncate">${title}</h5>
+                    <small>${formatDate(entry.timestamp)}</small>
+                `;
+                
+                // Click par entry load karein
+                item.addEventListener('click', () => loadEntry(entry.id));
+                entriesList.appendChild(item);
+            });
+        }
+
+        // Clears the editor and starts a new session
+        function startNewEntry() {
+            // Agar user ne bina save kiye New Entry button dabaaya hai
+            if (entryContent.value.trim() !== "" && currentEntryId === null) {
+                if (!confirm("Your current entry is unsaved. Do you want to continue without saving?")) {
+                    return;
+                }
+            }
+            
+            currentEntryId = null;
+            entryTitle.value = `New Untitled Entry`;
+            entryContent.value = '';
+            entryDate.textContent = formatDate(Date.now());
+            renderEntriesList();
+        }
+
+        // Loads a past entry into the editor
+        function loadEntry(id) {
+            const entries = getEntries();
+            const entry = entries.find(e => e.id === id);
+
+            if (entry) {
+                currentEntryId = entry.id;
+                entryTitle.value = entry.title;
+                entryContent.value = entry.content;
+                entryDate.textContent = formatDate(entry.timestamp);
+                renderEntriesList(); 
+            }
+        }
+
+        // Saves the current entry or updates an existing one
+        function saveCurrentEntry() {
+            const entries = getEntries();
+            const title = entryTitle.value.trim();
+            const content = entryContent.value.trim();
+
+            if (content.length === 0) {
+                alert("Please write something before saving.");
+                return;
+            }
+
+            if (currentEntryId) {
+                // Update existing entry
+                const index = entries.findIndex(e => e.id === currentEntryId);
+                if (index > -1) {
+                    entries[index] = { 
+                        ...entries[index], 
+                        title: title, 
+                        content: content, 
+                        timestamp: Date.now() 
+                    };
+                }
+            } else {
+                // Create new entry
+                const newId = Date.now().toString() + Math.random().toString(16).slice(2); 
+                const newEntry = {
+                    id: newId,
+                    title: title,
+                    content: content,
+                    timestamp: Date.now()
+                };
+                entries.push(newEntry);
+                currentEntryId = newId; 
+            }
+
+            saveEntries(entries);
+            renderEntriesList();
+            alert("Entry saved successfully!");
+        }
+
+        // Deletes the currently loaded entry
+        function deleteCurrentEntry() {
+            if (!currentEntryId) return;
+
+            if (confirm("Are you sure you want to delete this entry? This action cannot be undone.")) {
+                let entries = getEntries();
+                // Filter out the entry to be deleted
+                entries = entries.filter(e => e.id !== currentEntryId);
+                
+                saveEntries(entries);
+                alert("Entry deleted successfully!");
+                startNewEntry(); // Start a new entry after deletion
+            }
+        }
+
+
+        // --- Event Listeners and Initial Load ---
+        
+        saveButton.addEventListener('click', saveCurrentEntry);
+        newEntryButton.addEventListener('click', startNewEntry);
+        deleteButton.addEventListener('click', deleteCurrentEntry);
+
+        // Initial setup
+        renderEntriesList();
+        
+        // If there are saved entries, load the newest one by default
+        const savedEntries = getEntries();
+        if (savedEntries.length > 0) {
+            loadEntry(savedEntries.sort((a, b) => b.timestamp - a.timestamp)[0].id);
+        } else {
+            startNewEntry();
+        }
+    </script>
+</body>
+</html>
