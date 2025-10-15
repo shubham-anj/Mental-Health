@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Mental Health Matters (Modal Login)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        /* ... (Aapka puraana Custom CSS yahaan rahega) ... */
+        
+        .hero-section {
+            background-color: #fdfefe;
+        }
+
+        .illustration-container {
+            max-width: 450px;
+        }
+
+        .custom-illustration {
+            height: auto;
+        }
+
+        .small-text {
+            font-size: 1.5rem;
+            font-weight: 400;
+            color: #666;
+            letter-spacing: 2px;
+        }
+
+        .large-text {
+            font-size: 5rem;
+            font-weight: 800;
+            color: #e83e6f;
+            letter-spacing: 5px;
+            line-height: 1;
+        }
+
+        @media (max-width: 768px) {
+            .large-text {
+                font-size: 3.5rem;
+            }
+        }
+
+        .custom-icon-color {
+            color: #55a8a7;
+            font-size: 1.25rem;
+            width: 25px;
+            text-align: center;
+        }
+
+        .custom-submit-btn {
+            background-color: #55a8a7;
+            color: white;
+            font-weight: 600;
+            border: none;
+            transition: background-color 0.3s;
+        }
+
+        .custom-submit-btn:hover {
+            background-color: #438786;
+        }
+
+        .social-icon {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            color: white;
+            font-size: 18px;
+            transition: opacity 0.3s;
+        }
+
+        .instagram-bg { background-color: #c13584; }
+        .linkedin-bg { background-color: #0077b5; }
+        .facebook-bg { background-color: #3b5998; }
+
+        .nav-btn {
+            padding: 8px 15px;
+            margin-right: 10px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .nav-btn-outline {
+            color: #55a8a7;
+            border: 1px solid #55a8a7;
+        }
+        
+        .nav-btn-outline:hover {
+            background-color: #55a8a7;
+            color: white;
+        }
+        
+        .nav-btn-primary {
+            background-color: #55a8a7;
+            color: white;
+        }
+        
+        .nav-btn-primary:hover {
+            background-color: #438786;
+            color: white;
+        }
+        
+        /* Modal button styling */
+        .modal-role-btn {
+            background-color: #f7f7f7;
+            border: 2px solid #ddd;
+            transition: all 0.2s;
+        }
+        .modal-role-btn:hover {
+            background-color: #e0f2f1; /* Light teal background */
+            border-color: #55a8a7;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-3">
+            <div class="container-fluid px-5">
+                
+                <div class="navbar-nav me-auto">
+                    <a class="nav-btn nav-btn-primary me-2" href="#">Home</a>
+                    <a class="nav-btn nav-btn-outline me-2" href="#">News</a>
+                    <a class="nav-btn nav-btn-outline" href="#">Articles</a>
+                </div>
+                
+                <div class="ms-auto">
+                    <button class="btn nav-btn nav-btn-outline" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#loginRoleModal">
+                        Login/Sign Up
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <section class="hero-section text-center py-5">
+        <div class="container">
+            <div class="illustration-container mx-auto mb-4">
+                <img src="mental_health_illustration.png" alt="Mental Health Illustration" class="img-fluid custom-illustration">
+            </div>
+            
+            <h1 class="headline mb-0">
+                <span class="d-block small-text">YOUR MENTAL HEALTH</span>
+                <span class="d-block large-text">MATTERS</span>
+            </h1>
+        </div>
+    </section>
+
+    <footer class="bg-white border-top pt-5 pb-4">
+        <div class="container">
+            <div class="row contact-container">
+                <div class="col-md-6 mb-4 mb-md-0 px-4">
+                    <h4 class="mb-4 fw-bold">Reach Out</h4>
+                    <form>
+                        <div class="mb-3">
+                            <input type="text" class="form-control" placeholder="Your Name*" required>
+                        </div>
+                        <div class="mb-3">
+                            <input type="email" class="form-control" placeholder="Your Email*" required>
+                        </div>
+                        <div class="mb-3">
+                            <textarea class="form-control" placeholder="Message*" rows="4" required></textarea>
+                        </div>
+                        <button type="submit" class="btn custom-submit-btn rounded-pill px-4">SUBMIT</button>
+                    </form>
+                </div>
+                <div class="col-md-6 px-4">
+                    <h4 class="mb-4 fw-bold">Contact Info</h4>
+                    <div class="d-flex align-items-center mb-2 info-group">
+                        <i class="fas fa-map-marker-alt me-3 custom-icon-color"></i>
+                        <p class="mb-0 text-dark fw-bold">--</p>
+                    </div>
+                    <div class="d-flex align-items-center mb-2 info-group">
+                        <i class="fas fa-phone-alt me-3 custom-icon-color"></i>
+                        <p class="mb-0 text-muted">+91 3141592567</p>
+                    </div>
+                    <div class="d-flex align-items-center mb-4 info-group">
+                        <i class="fas fa-envelope me-3 custom-icon-color"></i>
+                        <p class="mb-0 text-muted">developer.mentalhealth@gmail.com</p>
+                    </div>
+                    <div class="d-flex social-links">
+                        <a href="#" class="me-3"><i class="fab fa-instagram social-icon instagram-bg"></i></a>
+                        <a href="#" class="me-3"><i class="fab fa-linkedin-in social-icon linkedin-bg"></i></a>
+                        <a href="#" class="me-3"><i class="fab fa-facebook-f social-icon facebook-bg"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr class="mt-5 mb-4">
+            <div class="app-download d-flex justify-content-center gap-3">
+                <a href="#"><img src="app_store_badge.png" alt="Download on the App Store" height="45"></a>
+                <a href="#"><img src="google_play_badge.png" alt="Get it on Google Play" height="45"></a>
+            </div>
+        </div>
+    </footer>
+
+
+    <div class="modal fade" id="loginRoleModal" tabindex="-1" aria-labelledby="loginRoleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold" id="loginRoleModalLabel">Select Your Role</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body pt-2 text-center">
+                    <p class="text-muted mb-4">Please choose how you want to sign in or sign up.</p>
+                    
+                    <a href="/user/user_login" class="btn d-block p-4 mb-3 modal-role-btn">
+                        <i class="fas fa-user-friends fa-2x mb-2 text-primary"></i>
+                        <h6 class="fw-bold mb-0">Login/Sign Up as USER</h6>
+                        <small class="text-muted">I need support or want to explore content.</small>
+                    </a>
+
+                    <a href="/user/therap_login" class="btn d-block p-4 modal-role-btn">
+                        <i class="fas fa-briefcase-medical fa-2x mb-2 text-success"></i>
+                        <h6 class="fw-bold mb-0">Login/Sign Up as THERAPIST</h6>
+                        <small class="text-muted">I provide professional counseling and services.</small>
+                    </a>
+
+                </div>
+                <div class="modal-footer justify-content-center border-0 pt-0">
+                    <small class="text-muted">By continuing, you agree to our Terms.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
