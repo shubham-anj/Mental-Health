@@ -1,0 +1,28 @@
+{
+  "name": "mental-health",
+  "version": "1.0.0",
+  "description": "Your health matters",
+  "homepage": "https://github.com/shubham-anj/Mental-Health#readme",
+  "bugs": {
+    "url": "https://github.com/shubham-anj/Mental-Health/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shubham-anj/Mental-Health.git"
+  },
+  "license": "ISC",
+  "author": "Shubham Kumar",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
